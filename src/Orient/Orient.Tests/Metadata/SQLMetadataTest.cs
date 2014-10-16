@@ -62,7 +62,7 @@ namespace Orient.Tests.Metadata
                     .Run();
 
                 var document = database.Schema.Properties<TestVertexClass>();
-                
+
                 validateSchema("Bool", OType.Boolean, document);
                 validateSchema("Float1", OType.Float, document);
                 validateSchema("Float", OType.Float, document);
@@ -81,14 +81,10 @@ namespace Orient.Tests.Metadata
                 validateSchema("Decimal", OType.Decimal, document);
                 validateSchema("Document", OType.Embedded, document);
                 validateSchema("LinkList_list", OType.LinkList, document);
-                validateSchema("LinkList_ienumeratable", OType.LinkList, document);
                 validateSchema("LinkMap", OType.LinkMap, document);
                 validateSchema("EmbeddedMap", OType.EmbeddedMap, document);
-                validateSchema("EmbededList_roc", OType.EmbeddedList, document);
                 validateSchema("LinkedSet", OType.LinkSet, document);
                 validateSchema("EmbeddedSet", OType.EmbeddedSet, document);
-                validateSchema("EmbeddedSet_iset", OType.EmbeddedSet, document);
-                validateSchema("EmbeddedList_ilist", OType.EmbeddedList, document);
             }
         }
 

@@ -29,14 +29,10 @@ namespace Orient.Tests
         public Decimal Decimal { get; set; }
         public ODocument Document { get; set; }
         public List<ORID> LinkList_list { get; set; }
-        public IEnumerable<ORID> LinkList_ienumeratable { get; set; }
-        public ReadOnlyCollection<ODocument> EmbededList_roc { get; set; }
         public Dictionary<string, ORID> LinkMap { get; set; }
         public Dictionary<string, ODocument> EmbeddedMap { get; set; }
         public HashSet<ORID> LinkedSet { get; set; }
         public HashSet<ODocument> EmbeddedSet { get; set; }
-        public ISet<ODocument> EmbeddedSet_iset { get; set; }
-        public IList<ODocument> EmbeddedList_ilist { get; set; }
 
     }
 
