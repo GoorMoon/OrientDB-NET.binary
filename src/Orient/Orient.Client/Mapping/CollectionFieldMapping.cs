@@ -10,14 +10,15 @@ namespace Orient.Client.Mapping
     {
         private readonly Func<object> _listFactory;
 
-        public ListNamedFieldMapping(PropertyInfo propertyInfo, string fieldPath) : base(propertyInfo, fieldPath)
+        public ListNamedFieldMapping(PropertyInfo propertyInfo, string fieldPath)
+            : base(propertyInfo, fieldPath)
         {
             _listFactory = FastConstructor.BuildConstructor(_propertyInfo.PropertyType);
         }
 
         protected override IList CreateListInstance(int collectionSize)
         {
-            return (IList) _listFactory();
+            return (IList)_listFactory();
         }
 
         protected override void AddItemToList(IList list, int index, object item)
@@ -39,7 +40,7 @@ namespace Orient.Client.Mapping
 
         protected override IList CreateListInstance(int collectionSize)
         {
-            return (IList) _arrayFactory(collectionSize);
+            return (IList)_arrayFactory(collectionSize);
         }
 
         protected override void AddItemToList(IList list, int index, object item)
@@ -93,7 +94,7 @@ namespace Orient.Client.Mapping
                 if (_needsMapping)
                 {
                     object element = _elementFactory();
-                    _mapper.ToObject((ODocument) t, element);
+                    _mapper.ToObject((ODocument)t, element);
                     oMapped = element;
                 }
 
@@ -117,24 +118,27 @@ namespace Orient.Client.Mapping
         private static bool NeedsNoConversion(Type elementType)
         {
             return elementType.IsPrimitive ||
-                   (elementType == typeof (string)) ||
-                   (elementType == typeof (DateTime)) ||
-                   (elementType == typeof (decimal)) ||
-                   (elementType == typeof (ORID));
+                   (elementType == typeof(string)) ||
+                   (elementType == typeof(DateTime)) ||
+                   (elementType == typeof(decimal)) ||
+                   (elementType == typeof(ORID));
         }
 
         public override void MapToDocument(TTarget typedObject, ODocument document)
         {
-            var targetElementType = _needsMapping ? typeof (ODocument) : _targetElementType;
-            var listType = typeof (List<>).MakeGenericType(targetElementType);
-            var targetList = (IList) Activator.CreateInstance(listType);
+            var targetElementType = _needsMapping ? typeof(ODocument) : _targetElementType;
+            var listType = typeof(List<>).MakeGenericType(targetElementType);
+            var targetList = (IList)Activator.CreateInstance(listType);
 
-            var sourceList = (IEnumerable) GetPropertyValue(typedObject);
+            var sourceList = (IEnumerable)GetPropertyValue(typedObject);
 
-            foreach (var item in sourceList)
-                targetList.Add(_needsMapping ? _mapper.ToDocument(item) : item);
+            if (sourceList != null)
+            {
+                foreach (var item in sourceList)
+                    targetList.Add(_needsMapping ? _mapper.ToDocument(item) : item);
 
-            document.SetField(_fieldPath, targetList);
+                document.SetField(_fieldPath, targetList);
+            }
         }
     }
 }

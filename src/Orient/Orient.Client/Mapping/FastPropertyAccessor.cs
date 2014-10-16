@@ -9,19 +9,23 @@ namespace Orient.Client.Mapping
     {
         public static Func<object> BuildConstructor(Type type)
         {
+            ConstructorInfo constructorInfo = type.GetConstructor(Type.EmptyTypes);
+            if (constructorInfo == null)
+                throw new MissingMethodException(type.Name + " has so public default constructor");
+
             Expression body = Expression.New(type);
-            return Expression.Lambda<Func<object>>(body).Compile();    
+            return Expression.Lambda<Func<object>>(body).Compile();
         }
 
         public static Func<T, object> BuildConstructor<T>(Type type)
         {
             var param1 = Expression.Parameter(typeof(T), "param1");
-            ConstructorInfo constructorInfo = type.GetConstructor(new Type[] {typeof (T)});
+            ConstructorInfo constructorInfo = type.GetConstructor(new Type[] { typeof(T) });
             if (constructorInfo == null)
                 throw new MissingMethodException(type.Name + " has so public constructore with 1 parameter of type " + typeof(T).Name);
             Expression body = Expression.New(constructorInfo, param1);
-            return Expression.Lambda<Func<T, object>>(body, param1).Compile();    
-            
+            return Expression.Lambda<Func<T, object>>(body, param1).Compile();
+
         }
 
     }
@@ -30,7 +34,7 @@ namespace Orient.Client.Mapping
     {
         public static Func<T, TReturn> BuildTypedGetter<T, TReturn>(PropertyInfo propertyInfo)
         {
-            return (Func<T, TReturn>) Delegate.CreateDelegate(typeof(Func<T, TReturn>), propertyInfo.GetGetMethod());
+            return (Func<T, TReturn>)Delegate.CreateDelegate(typeof(Func<T, TReturn>), propertyInfo.GetGetMethod());
         }
 
         public static Action<T, TProperty> BuildTypedSetter<T, TProperty>(PropertyInfo propertyInfo)
