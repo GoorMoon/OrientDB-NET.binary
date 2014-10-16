@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Orient.Client.Protocol;
@@ -40,8 +41,8 @@ namespace Orient.Client
 
         public OSqlCreateClass Class<T>()
         {
-            _type = typeof (T);
-            _className = typeof (T).Name;
+            _type = typeof(T);
+            _className = typeof(T).Name;
             return Class(_className);
         }
 
@@ -70,7 +71,7 @@ namespace Orient.Client
             if (_type != null && _type != typeof(T))
                 throw new InvalidOperationException("Inconsistent type specified - type for CreateProperties<T> must match type for Class<T>");
 
-            _type = typeof (T);
+            _type = typeof(T);
 
             _autoProperties = true;
             return this;
@@ -121,14 +122,20 @@ namespace Orient.Client
 
         private void CreateAutoProperties()
         {
-            foreach (var pi in _type.GetProperties(BindingFlags.DeclaredOnly))
+            // If using any BindingFlags should declare exactly what you want
+            foreach (var pi in _type.GetProperties(BindingFlags.DeclaredOnly |
+                        BindingFlags.Public |
+                        BindingFlags.Instance))
             {
                 if (pi.CanRead && pi.CanWrite)
                 {
-                    if (pi.PropertyType.IsPrimitive)
-                    {
-                        CreateProperty(pi);
-                    }
+                    /*
+                     The primitive types are Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single.
+                     */
+                    //if (pi.PropertyType.IsPrimitive)
+                    //{
+                    CreateProperty(pi);
+                    //}
                 }
             }
         }
@@ -141,15 +148,100 @@ namespace Orient.Client
 
         private string ConvertPropertyType(Type propertyType)
         {
+            if (typeof(IBaseRecord).IsAssignableFrom(propertyType))
+            {
+                return "Embedded";
+            }
+
             switch (propertyType.Name)
             {
+                case "Boolean":
+                    return "Boolean";
+                case "Single":
+                    return "Float";
                 case "Int64":
                     return "Long";
                 case "String":
                     return "String";
                 case "Int32":
                     return "Integer";
+                case "Int16":
+                    return "Short";
+                case "Double":
+                    return "Double";
+                case "DateTime":
+                    return "Datetime";
+                case "Byte[]":
+                    return "Binary";
+                case "ORID":
+                    return "Link";
+                case "Byte":
+                case "Char":
+                    return "Byte";
+                case "Decimal":
+                    return "Decimal";
+                default:
+                    if (typeof(IEnumerable).IsAssignableFrom(propertyType))
+                    {
+                        if (propertyType.IsGenericType)
+                        {
+                            // Check for Map                            
+                            if (typeof(IDictionary).IsAssignableFrom(propertyType))
+                            {
+                                if (typeof(string).IsAssignableFrom(propertyType.GetGenericArguments()[0]) && typeof(ORID).IsAssignableFrom(propertyType.GetGenericArguments()[1]))
+                                {
+                                    return "LinkMap";
+                                }
+                                if (typeof(string).IsAssignableFrom(propertyType.GetGenericArguments()[0]) && typeof(IBaseRecord).IsAssignableFrom(propertyType.GetGenericArguments()[1]))
+                                {
+                                    return "EmbeddedMap";
+                                }
+                            }
+                            // Check for Set
+                            if (propertyType.Name == "ISet`1")
+                            {
+                                if (typeof(ORID).IsAssignableFrom(propertyType.GetGenericArguments()[0]))
+                                {
+                                    return "LinkSet";
+                                }
+                                if (typeof(IBaseRecord).IsAssignableFrom(propertyType.GetGenericArguments()[0]))
+                                {
+                                    return "EmbeddedSet";
+                                }
+                            }
+
+                            var interfaces = propertyType.GetInterfaces();
+                            foreach (var item in interfaces)
+                            {
+                                if (item.Name == "ISet`1")
+                                {
+                                    if (typeof(ISet<ORID>).IsAssignableFrom(propertyType))
+                                    {
+                                        return "LinkSet";
+                                    }
+
+                                    if (typeof(IBaseRecord).IsAssignableFrom(item.GetGenericArguments()[0]))
+                                    {
+                                        return "EmbeddedSet";
+                                    }
+                                }
+                            }
+
+                            // Check for List
+                            if (typeof(ORID).IsAssignableFrom(propertyType.GetGenericArguments()[0]))
+                            {
+                                return "LinkList";
+                            }
+                            else if (typeof(IBaseRecord).IsAssignableFrom(propertyType.GetGenericArguments()[0]))
+                            {
+                                return "EmbeddedList";
+                            }
+                        }
+                    }
+                    break;
+
             }
+
             throw new ArgumentException("propertyType " + propertyType.Name + " is not yet supported.");
         }
 
