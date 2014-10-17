@@ -1,5 +1,7 @@
 OrientDB-NET.binary is C#/.NET driver for [OrientDB](http://www.orientdb.org/) document/graph database which implements network binary protocol.
 
+Congratulation now OrientDB-NET.binary is official supported by the [OrientDB](http://www.orientdb.org/) if you want to download and test this driver please do this from this repository [orientechnologies/OrientDB-NET.binary](https://github.com/orientechnologies/OrientDB-NET.binary)
+
 Check out [wiki docs](https://github.com/yojimbo87/OrientDB-NET.binary/wiki) to learn more.
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/GoorMoon/OrientDB-NET.binary?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
