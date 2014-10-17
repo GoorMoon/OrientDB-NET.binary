@@ -12,3 +12,4 @@ This fork contains the following improvements
 * Better support for derived types - .ToUnique<TBase> will construct a TDerived if the database record is of type TDerived 
 
 Fetching a large block of records from the DB via Database.Load.ORID(orid).FetchPlan(plan) and converting them to typed objects about 6 times faster than original code using SQL commands and old mapping
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/GoorMoon/OrientDB-NET.binary?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
